@@ -1,0 +1,40 @@
+# Root
+.DS_Store
+Thumbs.db
+
+# -----------------------------
+# Server (Node.js backend)
+# -----------------------------
+/server/node_modules/
+server/.env
+server/dist/
+server/npm-debug.log*
+server/yarn-debug.log*
+server/yarn-error.log*
+server/logs/
+server/*.log
+server/*.pid
+server/*.seed
+server/dump/
+server/*.lock
+
+# -----------------------------
+# Client (Vite + React frontend)
+# -----------------------------
+/client/node_modules/
+client/.env
+client/dist/
+client/.DS_Store
+client/.vite/
+client/.cache/
+client/.next/
+client/coverage/
+
+# -----------------------------
+# Common Editor/OS Artifacts
+# -----------------------------
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+*.swp
