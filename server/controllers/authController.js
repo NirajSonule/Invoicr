@@ -7,14 +7,16 @@ const register = async (req, res) => {
   try {
     const user_username = await User.findOne({ username });
     if (user_username) {
-      res
+      return res
         .status(409)
         .json({ success: false, message: "Username already taken" });
     }
 
     const user_email = await User.findOne({ email });
     if (user_email) {
-      res.status(409).json({ success: false, message: "Email already exists" });
+      return res
+        .status(409)
+        .json({ success: false, message: "Email already exists" });
     }
 
     const newUser = new User({ username, email, password });
@@ -90,7 +92,9 @@ const getUser = async (req, res) => {
     const userId = req.user._id;
     const user = await User.findById(userId).select("-password");
     if (!user) {
-      res.status(404).json({ success: false, message: "User not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
 
     res.status(200).json({ success: true, user });
