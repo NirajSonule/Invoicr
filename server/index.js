@@ -6,6 +6,7 @@ import cors from "cors";
 import connectDB from "./config/db.js";
 import authRouter from "./routes/authRoutes.js";
 import clientRouter from "./routes/clientRoutes.js";
+import invoiceRouter from "./routes/invoiceRoutes.js";
 
 dotenv.config();
 
@@ -27,6 +28,7 @@ app.use(cookieParser());
 // Routes
 app.use("/api/auth", authRouter);
 app.use("/api", clientRouter);
+app.use("/api", invoiceRouter);
 
 app.listen(process.env.PORT || 3000, () => {
   console.log(`Server running on port ${process.env.PORT || 3000}`);
