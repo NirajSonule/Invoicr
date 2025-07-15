@@ -1,4 +1,5 @@
 import User from "../models/user.js";
+import { sendWelcomeEmail } from "../services/mailer.js";
 import { generateToken } from "../utils/jwt.js";
 
 const register = async (req, res) => {
@@ -40,6 +41,8 @@ const register = async (req, res) => {
         email: newUser.email,
       },
     });
+
+    sendWelcomeEmail(newUser.email, newUser.username);
   } catch (error) {
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
