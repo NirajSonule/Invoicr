@@ -1,6 +1,7 @@
 import User from "../models/user.js";
-import { sendWelcomeEmail } from "../services/mailer.js";
+import { sendResetPassEmail, sendWelcomeEmail } from "../services/mailer.js";
 import { generateToken } from "../utils/jwt.js";
+import { otpGenerator, otpVerify } from "../utils/otpHandler.js";
 
 const register = async (req, res) => {
   const { username, email, password } = req.body;
@@ -42,7 +43,9 @@ const register = async (req, res) => {
       },
     });
 
-    sendWelcomeEmail(newUser.email, newUser.username);
+    sendWelcomeEmail(newUser.email, newUser.username).catch((err) =>
+      console.error("Failed to send welcome email:", err)
+    );
   } catch (error) {
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
@@ -118,4 +121,51 @@ const logout = (req, res) => {
     .json({ success: true, message: "User logged-out successfully" });
 };
 
-export { register, login, getUser, logout };
+const generateOtp = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    const otp = await otpGenerator(user._id);
+    await sendResetPassEmail(user.email, user.username, otp);
+
+    res.status(200).json({ success: true, message: "OTP send to email" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+const resetPassword = async (req, res) => {
+  const { email, otp, newPassword } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    const isValid = await otpVerify(user._id, otp);
+    if (!isValid) {
+      return res.status(400).json({ success: false, message: "Invalid Otp" });
+    }
+
+    user.password = newPassword;
+    await user.save();
+
+    res
+      .status(200)
+      .json({ success: true, message: "Password reset was successfull" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+export { register, login, getUser, logout, generateOtp, resetPassword };
